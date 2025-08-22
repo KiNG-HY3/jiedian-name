@@ -1,0 +1,33 @@
+name: Update Nodes Daily
+
+on:
+  schedule:
+    # 每天 UTC 0 点执行一次，你可以改成其他时间
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 可以手动触发
+
+jobs:
+  update-nodes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install --upgrade pip
+
+      - name: Run conversion script
+        run: python convert.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add nodes.txt
+          git commit -m "自动更新节点备注 ⏰"
+          git push
